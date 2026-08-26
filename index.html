@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>مركز متابعة الوكالة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img">
+              <rect x="7" y="9" width="27" height="32" rx="4" fill="#0f766e" />
+              <rect x="15" y="5" width="26" height="35" rx="4" fill="#f59e0b" />
+              <path d="M22 21.5l5.2 5.1L36.5 16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M22 32h14" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8" />
+            </svg>
+          </div>
+          <div>
+            <strong>نور التميز</strong>
+            <span>متابعة الالتزامات</span>
+          </div>
+        </div>
+
+        <nav class="side-nav" aria-label="الأقسام">
+          <button class="nav-item active" data-view="dashboard" type="button">
+            <span class="nav-icon">▣</span>
+            الرئيسية
+          </button>
+          <button class="nav-item" data-view="records" type="button">
+            <span class="nav-icon">≡</span>
+            السجلات
+          </button>
+          <button class="nav-item" data-view="employees" type="button">
+            <span class="nav-icon">◎</span>
+            الموظفون
+          </button>
+          <button class="nav-item" data-view="history" type="button">
+            <span class="nav-icon">↺</span>
+            السجل التاريخي
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <span>آخر تحديث</span>
+          <strong id="lastUpdated">--</strong>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">وكالة دعاية وإعلان</p>
+            <h1>مركز متابعة الوثائق والتراخيص</h1>
+          </div>
+          <div class="top-actions">
+            <button id="exportBtn" class="icon-button ghost" type="button" title="تصدير نسخة احتياطية" aria-label="تصدير نسخة احتياطية">
+              <span aria-hidden="true">⇩</span>
+            </button>
+            <button id="resetDemoBtn" class="icon-button ghost" type="button" title="استرجاع بيانات تجريبية" aria-label="استرجاع بيانات تجريبية">
+              <span aria-hidden="true">↻</span>
+            </button>
+            <button class="primary-button" data-open-panel type="button">
+              <span aria-hidden="true">+</span>
+              إضافة سجل
+            </button>
+          </div>
+        </header>
+
+        <section class="view active" id="dashboardView" aria-labelledby="dashboardTitle">
+          <div class="section-heading">
+            <h2 id="dashboardTitle">نظرة عامة</h2>
+            <div class="segmented" role="tablist" aria-label="فلترة الفترة">
+              <button class="segment active" data-range="all" type="button">الكل</button>
+              <button class="segment" data-range="7" type="button">7 أيام</button>
+              <button class="segment" data-range="15" type="button">15 يوم</button>
+              <button class="segment" data-range="30" type="button">30 يوم</button>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="metricGrid"></div>
+
+          <div class="main-grid">
+            <section class="panel wide-panel">
+              <div class="panel-head">
+                <h3>إجراءات عاجلة</h3>
+                <span id="urgentCount">0 سجل</span>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>المستند</th>
+                      <th>الجهة</th>
+                      <th>النوع</th>
+                      <th>الانتهاء</th>
+                      <th>المتبقي</th>
+                      <th>المسؤول</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="urgentTable"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h3>أقرب الاستحقاقات</h3>
+                <span>حسب التاريخ</span>
+              </div>
+              <div id="timelineList" class="timeline-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="recordsView" aria-labelledby="recordsTitle">
+          <div class="section-heading">
+            <h2 id="recordsTitle">كل السجلات</h2>
+            <button class="primary-button compact" data-open-panel type="button">
+              <span aria-hidden="true">+</span>
+              إضافة
+            </button>
+          </div>
+
+          <div class="filters">
+            <label class="search-field">
+              <span>بحث</span>
+              <input id="searchInput" type="search" placeholder="اسم مستند، موظف، جهة..." />
+            </label>
+            <label>
+              <span>النوع</span>
+              <select id="categoryFilter"></select>
+            </label>
+            <label>
+              <span>الحالة</span>
+              <select id="statusFilter"></select>
+            </label>
+            <label>
+              <span>المسؤول</span>
+              <select id="ownerFilter"></select>
+            </label>
+          </div>
+
+          <section class="panel">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>المستند</th>
+                    <th>الجهة</th>
+                    <th>النوع</th>
+                    <th>الانتهاء</th>
+                    <th>الحالة</th>
+                    <th>المسؤول</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="recordsTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="employeesView" aria-labelledby="employeesTitle">
+          <div class="section-heading">
+            <h2 id="employeesTitle">ملفات الموظفين</h2>
+          </div>
+          <div id="employeeGrid" class="employee-grid"></div>
+        </section>
+
+        <section class="view" id="historyView" aria-labelledby="historyTitle">
+          <div class="section-heading">
+            <h2 id="historyTitle">السجل التاريخي</h2>
+          </div>
+          <section class="panel">
+            <div id="historyList" class="history-list"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="recordDialog">
+      <form id="recordForm" method="dialog" class="dialog-body">
+        <div class="dialog-head">
+          <h2>إضافة سجل متابعة</h2>
+          <button class="icon-button ghost" value="cancel" type="button" data-close-dialog title="إغلاق" aria-label="إغلاق">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            <span>اسم المستند</span>
+            <input name="title" required placeholder="إقامة، عقد إيجار، رخصة بلدية" />
+          </label>
+          <label>
+            <span>النوع</span>
+            <select name="category" required>
+              <option value="موظف">موظف</option>
+              <option value="ترخيص">ترخيص</option>
+              <option value="عقد">عقد</option>
+              <option value="سلامة">سلامة</option>
+              <option value="صيانة">صيانة</option>
+              <option value="اشتراك">اشتراك</option>
+            </select>
+          </label>
+          <label>
+            <span>الشخص أو الجهة</span>
+            <input name="subject" required placeholder="محمد أحمد، الوكالة، شركة..." />
+          </label>
+          <label>
+            <span>المسؤول</span>
+            <input name="owner" required placeholder="الموارد البشرية، الإدارة..." />
+          </label>
+          <label>
+            <span>رقم المستند</span>
+            <input name="docNumber" placeholder="اختياري" />
+          </label>
+          <label>
+            <span>تاريخ الإصدار</span>
+            <input name="issueDate" type="date" />
+          </label>
+          <label>
+            <span>تاريخ الانتهاء</span>
+            <input name="expiryDate" type="date" required />
+          </label>
+          <label>
+            <span>اسم المرفق</span>
+            <input name="attachment" placeholder="مثلاً residence-2026.pdf" />
+          </label>
+          <label class="full-field">
+            <span>ملاحظات</span>
+            <textarea name="notes" rows="3" placeholder="أي تفاصيل مهمة"></textarea>
+          </label>
+        </div>
+
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-close-dialog>إلغاء</button>
+          <button class="primary-button" type="submit">حفظ السجل</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="renewDialog">
+      <form id="renewForm" method="dialog" class="dialog-body">
+        <div class="dialog-head">
+          <h2>تسجيل تجديد</h2>
+          <button class="icon-button ghost" value="cancel" type="button" data-close-renew title="إغلاق" aria-label="إغلاق">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <input type="hidden" name="recordId" />
+        <div class="form-grid">
+          <label>
+            <span>تاريخ الإصدار الجديد</span>
+            <input name="issueDate" type="date" />
+          </label>
+          <label>
+            <span>تاريخ الانتهاء الجديد</span>
+            <input name="expiryDate" type="date" required />
+          </label>
+          <label>
+            <span>اسم المرفق الجديد</span>
+            <input name="attachment" placeholder="اختياري" />
+          </label>
+          <label class="full-field">
+            <span>ملاحظة التجديد</span>
+            <textarea name="note" rows="3"></textarea>
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-close-renew>إلغاء</button>
+          <button class="primary-button" type="submit">تسجيل التجديد</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
