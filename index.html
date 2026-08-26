@@ -59,6 +59,8 @@
             <h1>مركز متابعة الوثائق والتراخيص</h1>
           </div>
           <div class="top-actions">
+            <span id="syncStatus" class="sync-status">غير متصل</span>
+            <button id="authBtn" class="secondary-button" type="button">تسجيل الدخول</button>
             <button id="exportBtn" class="icon-button ghost" type="button" title="تصدير نسخة احتياطية" aria-label="تصدير نسخة احتياطية">
               <span aria-hidden="true">⇩</span>
             </button>
@@ -281,6 +283,42 @@
       </form>
     </dialog>
 
+    <dialog id="authDialog">
+      <form id="authForm" method="dialog" class="dialog-body">
+        <div class="dialog-head">
+          <h2>تسجيل الدخول</h2>
+          <button class="icon-button ghost" value="cancel" type="button" data-close-auth title="إغلاق" aria-label="إغلاق">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+
+        <div class="auth-copy">
+          <strong>اربط بياناتك بقاعدة Supabase</strong>
+          <span>بعد الدخول، أي سجل تضيفه سيحفظ في قاعدة البيانات بدل التخزين المحلي.</span>
+        </div>
+
+        <div class="form-grid">
+          <label class="full-field">
+            <span>البريد الإلكتروني</span>
+            <input name="email" type="email" required placeholder="name@example.com" />
+          </label>
+          <label class="full-field">
+            <span>كلمة المرور</span>
+            <input name="password" type="password" required minlength="6" />
+          </label>
+        </div>
+
+        <p id="authMessage" class="form-message" role="status"></p>
+
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-auth-mode="signup">إنشاء حساب</button>
+          <button class="primary-button" type="submit">دخول</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./config.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

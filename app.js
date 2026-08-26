@@ -1,104 +1,25 @@
 const STORAGE_KEY = "agency-compliance-dashboard-v1";
+const hasSupabaseConfig = Boolean(window.APP_CONFIG?.supabaseUrl && window.APP_CONFIG?.supabaseKey && window.supabase);
+const supabaseClient = hasSupabaseConfig
+  ? window.supabase.createClient(window.APP_CONFIG.supabaseUrl, window.APP_CONFIG.supabaseKey)
+  : null;
 
 const categories = ["الكل", "موظف", "ترخيص", "عقد", "سلامة", "صيانة", "اشتراك"];
 const statusOptions = ["الكل", "منتهي", "عاجل", "يحتاج إجراء", "قريب الانتهاء", "ساري"];
 
 const seedRecords = [
-  {
-    id: crypto.randomUUID(),
-    title: "إقامة",
-    category: "موظف",
-    subject: "محمد أحمد",
-    owner: "الموارد البشرية",
-    docNumber: "IQ-2041",
-    issueDate: "2025-09-20",
-    expiryDate: "2026-09-02",
-    attachment: "iqama-mohamed-2026.pdf",
-    notes: "تجهيز طلب التجديد قبل الانتهاء بأسبوعين.",
-    history: []
-  },
-  {
-    id: crypto.randomUUID(),
-    title: "عقد عمل",
-    category: "موظف",
-    subject: "سارة خالد",
-    owner: "الإدارة",
-    docNumber: "EMP-108",
-    issueDate: "2025-10-15",
-    expiryDate: "2026-10-15",
-    attachment: "contract-sara.pdf",
-    notes: "",
-    history: []
-  },
-  {
-    id: crypto.randomUUID(),
-    title: "التأمين الطبي",
-    category: "موظف",
-    subject: "محمد أحمد",
-    owner: "الموارد البشرية",
-    docNumber: "MED-551",
-    issueDate: "2025-12-20",
-    expiryDate: "2026-12-20",
-    attachment: "medical-mohamed.pdf",
-    notes: "",
-    history: []
-  },
-  {
-    id: crypto.randomUUID(),
-    title: "رخصة البلدية",
-    category: "ترخيص",
-    subject: "الوكالة",
-    owner: "الإدارة",
-    docNumber: "MUN-7432",
-    issueDate: "2025-09-05",
-    expiryDate: "2026-09-05",
-    attachment: "municipality-license.pdf",
-    notes: "مطلوب مراجعة الرسوم قبل التجديد.",
-    history: []
-  },
-  {
-    id: crypto.randomUUID(),
-    title: "طفاية حريق",
-    category: "سلامة",
-    subject: "مدخل المكتب",
-    owner: "مسؤول الإدارة",
-    docNumber: "FE-01",
-    issueDate: "2026-02-01",
-    expiryDate: "2026-08-29",
-    attachment: "fire-extinguisher-01.jpg",
-    notes: "الفحص القادم قريب.",
-    history: []
-  },
-  {
-    id: crypto.randomUUID(),
-    title: "عقد الإيجار",
-    category: "عقد",
-    subject: "مقر الوكالة",
-    owner: "المدير العام",
-    docNumber: "RENT-2026",
-    issueDate: "2026-01-01",
-    expiryDate: "2026-12-31",
-    attachment: "office-rent.pdf",
-    notes: "",
-    history: []
-  },
-  {
-    id: crypto.randomUUID(),
-    title: "اشتراك برنامج التصميم",
-    category: "اشتراك",
-    subject: "فريق التصميم",
-    owner: "مدير التصميم",
-    docNumber: "SUB-90",
-    issueDate: "2026-01-12",
-    expiryDate: "2026-09-15",
-    attachment: "",
-    notes: "مراجعة عدد المستخدمين قبل التجديد.",
-    history: []
-  }
+  { title: "إقامة", category: "موظف", subject: "محمد أحمد", owner: "الموارد البشرية", docNumber: "IQ-2041", issueDate: "2025-09-20", expiryDate: "2026-09-02", attachment: "iqama-mohamed-2026.pdf", notes: "تجهيز طلب التجديد قبل الانتهاء بأسبوعين.", history: [] },
+  { title: "عقد عمل", category: "موظف", subject: "سارة خالد", owner: "الإدارة", docNumber: "EMP-108", issueDate: "2025-10-15", expiryDate: "2026-10-15", attachment: "contract-sara.pdf", notes: "", history: [] },
+  { title: "التأمين الطبي", category: "موظف", subject: "محمد أحمد", owner: "الموارد البشرية", docNumber: "MED-551", issueDate: "2025-12-20", expiryDate: "2026-12-20", attachment: "medical-mohamed.pdf", notes: "", history: [] },
+  { title: "رخصة البلدية", category: "ترخيص", subject: "الوكالة", owner: "الإدارة", docNumber: "MUN-7432", issueDate: "2025-09-05", expiryDate: "2026-09-05", attachment: "municipality-license.pdf", notes: "مطلوب مراجعة الرسوم قبل التجديد.", history: [] },
+  { title: "طفاية حريق", category: "سلامة", subject: "مدخل المكتب", owner: "مسؤول الإدارة", docNumber: "FE-01", issueDate: "2026-02-01", expiryDate: "2026-08-29", attachment: "fire-extinguisher-01.jpg", notes: "الفحص القادم قريب.", history: [] },
+  { title: "عقد الإيجار", category: "عقد", subject: "مقر الوكالة", owner: "المدير العام", docNumber: "RENT-2026", issueDate: "2026-01-01", expiryDate: "2026-12-31", attachment: "office-rent.pdf", notes: "", history: [] },
+  { title: "اشتراك برنامج التصميم", category: "اشتراك", subject: "فريق التصميم", owner: "مدير التصميم", docNumber: "SUB-90", issueDate: "2026-01-12", expiryDate: "2026-09-15", attachment: "", notes: "مراجعة عدد المستخدمين قبل التجديد.", history: [] }
 ];
 
 const state = {
-  records: loadRecords(),
+  user: null,
+  records: getLocalRecords(),
   activeRange: "all",
   filters: {
     search: "",
@@ -128,6 +49,11 @@ const els = {
   recordForm: document.getElementById("recordForm"),
   renewDialog: document.getElementById("renewDialog"),
   renewForm: document.getElementById("renewForm"),
+  authDialog: document.getElementById("authDialog"),
+  authForm: document.getElementById("authForm"),
+  authMessage: document.getElementById("authMessage"),
+  authBtn: document.getElementById("authBtn"),
+  syncStatus: document.getElementById("syncStatus"),
   searchInput: document.getElementById("searchInput"),
   categoryFilter: document.getElementById("categoryFilter"),
   statusFilter: document.getElementById("statusFilter"),
@@ -136,13 +62,14 @@ const els = {
   resetDemoBtn: document.getElementById("resetDemoBtn")
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
   populateFilters();
   render();
+  await initializeAuth();
 });
 
-function loadRecords() {
+function getLocalRecords() {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (!stored) return getSeedRecords();
 
@@ -162,8 +89,160 @@ function getSeedRecords() {
   }));
 }
 
-function saveRecords() {
+async function initializeAuth() {
+  if (!supabaseClient) {
+    setSyncStatus("وضع محلي", "error");
+    return;
+  }
+
+  const { data } = await supabaseClient.auth.getSession();
+  state.user = data.session?.user || null;
+  updateAuthUi();
+
+  if (state.user) {
+    await loadRemoteRecords();
+  } else {
+    setSyncStatus("سجل الدخول للحفظ", "");
+  }
+
+  supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+    state.user = session?.user || null;
+    updateAuthUi();
+    if (state.user) {
+      await loadRemoteRecords();
+    } else {
+      state.records = getLocalRecords();
+      setSyncStatus("سجل الدخول للحفظ", "");
+      render();
+    }
+  });
+}
+
+function updateAuthUi() {
+  els.authBtn.textContent = state.user ? "تسجيل الخروج" : "تسجيل الدخول";
+}
+
+function setSyncStatus(text, type = "online") {
+  els.syncStatus.textContent = text;
+  els.syncStatus.classList.toggle("online", type === "online");
+  els.syncStatus.classList.toggle("error", type === "error");
+}
+
+async function loadRemoteRecords() {
+  setSyncStatus("جاري المزامنة...", "");
+  const { data, error } = await supabaseClient
+    .from("records")
+    .select("*, renewals(*)")
+    .order("expiry_date", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    setSyncStatus("تعذر الاتصال", "error");
+    return;
+  }
+
+  state.records = data.map(recordFromDb);
+  setSyncStatus("متصل بقاعدة البيانات", "online");
+  populateFilters();
+  render();
+}
+
+async function persistRecord(record) {
+  if (!state.user || !supabaseClient) {
+    state.records.unshift(record);
+    saveLocalRecords();
+    render();
+    return;
+  }
+
+  setSyncStatus("جاري الحفظ...", "");
+  const { data, error } = await supabaseClient
+    .from("records")
+    .insert(recordToDb(record))
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    setSyncStatus("فشل الحفظ", "error");
+    alert("لم يتم حفظ السجل. راجع إعدادات Supabase.");
+    return;
+  }
+
+  state.records.unshift(recordFromDb(data));
+  setSyncStatus("تم الحفظ", "online");
+  populateFilters();
+  render();
+}
+
+async function saveRemoteRenewal(record, renewal) {
+  if (!state.user || !supabaseClient) {
+    record.history.unshift(renewal);
+    saveLocalRecords();
+    render();
+    return;
+  }
+
+  setSyncStatus("جاري تسجيل التجديد...", "");
+  const { error: renewalError } = await supabaseClient
+    .from("renewals")
+    .insert(renewalToDb(record.id, renewal));
+
+  if (renewalError) {
+    console.error(renewalError);
+    setSyncStatus("فشل التجديد", "error");
+    alert("لم يتم تسجيل التجديد.");
+    return;
+  }
+
+  const { error: updateError } = await supabaseClient
+    .from("records")
+    .update({
+      issue_date: record.issueDate || null,
+      expiry_date: record.expiryDate,
+      attachment: record.attachment || null
+    })
+    .eq("id", record.id);
+
+  if (updateError) {
+    console.error(updateError);
+    setSyncStatus("فشل تحديث السجل", "error");
+    alert("تم تسجيل التجديد لكن لم يتم تحديث السجل.");
+    return;
+  }
+
+  await loadRemoteRecords();
+}
+
+async function deleteRemoteRecord(id) {
+  if (!state.user || !supabaseClient) {
+    state.records = state.records.filter((item) => item.id !== id);
+    saveLocalRecords();
+    render();
+    return;
+  }
+
+  setSyncStatus("جاري الحذف...", "");
+  const { error } = await supabaseClient.from("records").delete().eq("id", id);
+  if (error) {
+    console.error(error);
+    setSyncStatus("فشل الحذف", "error");
+    alert("لم يتم حذف السجل.");
+    return;
+  }
+
+  state.records = state.records.filter((item) => item.id !== id);
+  setSyncStatus("تم الحذف", "online");
+  populateFilters();
+  render();
+}
+
+function saveLocalRecords() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+  updateLastUpdated();
+}
+
+function updateLastUpdated() {
   els.lastUpdated.textContent = new Intl.DateTimeFormat("ar-SA", {
     dateStyle: "medium",
     timeStyle: "short"
@@ -177,6 +256,10 @@ function bindEvents() {
 
   document.querySelectorAll("[data-open-panel]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (!state.user && supabaseClient) {
+        els.authDialog.showModal();
+        return;
+      }
       els.recordForm.reset();
       els.recordDialog.showModal();
     });
@@ -190,6 +273,10 @@ function bindEvents() {
     button.addEventListener("click", () => els.renewDialog.close());
   });
 
+  document.querySelectorAll("[data-close-auth]").forEach((button) => {
+    button.addEventListener("click", () => els.authDialog.close());
+  });
+
   document.querySelectorAll("[data-range]").forEach((button) => {
     button.addEventListener("click", () => {
       document.querySelectorAll("[data-range]").forEach((segment) => segment.classList.remove("active"));
@@ -201,6 +288,20 @@ function bindEvents() {
 
   els.recordForm.addEventListener("submit", handleAddRecord);
   els.renewForm.addEventListener("submit", handleRenewRecord);
+  els.authForm.addEventListener("submit", (event) => handleAuth(event, "signin"));
+  els.authForm.querySelector("[data-auth-mode='signup']").addEventListener("click", (event) => handleAuth(event, "signup"));
+
+  els.authBtn.addEventListener("click", async () => {
+    if (state.user) {
+      await supabaseClient.auth.signOut();
+      return;
+    }
+    els.authMessage.textContent = "";
+    els.authMessage.className = "form-message";
+    els.authForm.reset();
+    els.authDialog.showModal();
+  });
+
   els.searchInput.addEventListener("input", (event) => {
     state.filters.search = event.target.value.trim();
     renderRecords();
@@ -219,10 +320,22 @@ function bindEvents() {
   });
 
   els.exportBtn.addEventListener("click", exportData);
-  els.resetDemoBtn.addEventListener("click", () => {
-    if (!confirm("استرجاع البيانات التجريبية سيستبدل السجلات الحالية. هل تريد المتابعة؟")) return;
-    state.records = getSeedRecords();
-    saveRecords();
+  els.resetDemoBtn.addEventListener("click", async () => {
+    if (!confirm("استرجاع البيانات التجريبية سيضيف سجلات تجريبية جديدة. هل تريد المتابعة؟")) return;
+    const records = getSeedRecords();
+    if (state.user && supabaseClient) {
+      setSyncStatus("جاري إضافة البيانات...", "");
+      const { error } = await supabaseClient.from("records").insert(records.map(recordToDb));
+      if (error) {
+        console.error(error);
+        setSyncStatus("فشل الإضافة", "error");
+        return;
+      }
+      await loadRemoteRecords();
+      return;
+    }
+    state.records = records;
+    saveLocalRecords();
     populateFilters();
     render();
   });
@@ -235,6 +348,36 @@ function bindEvents() {
     if (action.dataset.action === "renew") openRenewDialog(id);
     if (action.dataset.action === "delete") deleteRecord(id);
   });
+}
+
+async function handleAuth(event, mode) {
+  event.preventDefault();
+  if (!supabaseClient) return;
+
+  const form = new FormData(els.authForm);
+  const email = String(form.get("email") || "").trim();
+  const password = String(form.get("password") || "");
+  els.authMessage.textContent = mode === "signup" ? "جاري إنشاء الحساب..." : "جاري تسجيل الدخول...";
+  els.authMessage.className = "form-message";
+
+  const result = mode === "signup"
+    ? await supabaseClient.auth.signUp({ email, password })
+    : await supabaseClient.auth.signInWithPassword({ email, password });
+
+  if (result.error) {
+    els.authMessage.textContent = result.error.message;
+    els.authMessage.className = "form-message error";
+    return;
+  }
+
+  els.authMessage.textContent = mode === "signup"
+    ? "تم إنشاء الحساب. لو Supabase طلب تأكيد البريد، افتح الإيميل واضغط التأكيد."
+    : "تم تسجيل الدخول.";
+  els.authMessage.className = "form-message success";
+
+  if (result.data.session) {
+    els.authDialog.close();
+  }
 }
 
 function switchView(viewName) {
@@ -253,11 +396,11 @@ function setOptions(select, values) {
   select.innerHTML = values.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("");
 }
 
-function handleAddRecord(event) {
+async function handleAddRecord(event) {
   event.preventDefault();
   const form = new FormData(els.recordForm);
   const record = Object.fromEntries(form.entries());
-  state.records.unshift({
+  const normalizedRecord = {
     id: crypto.randomUUID(),
     title: record.title.trim(),
     category: record.category,
@@ -269,12 +412,10 @@ function handleAddRecord(event) {
     attachment: record.attachment.trim(),
     notes: record.notes.trim(),
     history: []
-  });
+  };
 
   els.recordDialog.close();
-  saveRecords();
-  populateFilters();
-  render();
+  await persistRecord(normalizedRecord);
 }
 
 function openRenewDialog(id) {
@@ -287,37 +428,37 @@ function openRenewDialog(id) {
   els.renewDialog.showModal();
 }
 
-function handleRenewRecord(event) {
+async function handleRenewRecord(event) {
   event.preventDefault();
   const form = new FormData(els.renewForm);
   const id = form.get("recordId");
   const record = state.records.find((item) => item.id === id);
   if (!record) return;
 
-  record.history.unshift({
+  const renewal = {
     previousIssueDate: record.issueDate,
     previousExpiryDate: record.expiryDate,
     previousAttachment: record.attachment,
+    newIssueDate: form.get("issueDate"),
+    newExpiryDate: form.get("expiryDate"),
+    newAttachment: form.get("attachment").trim(),
     renewedAt: new Date().toISOString(),
     note: form.get("note").trim()
-  });
-  record.issueDate = form.get("issueDate");
-  record.expiryDate = form.get("expiryDate");
-  record.attachment = form.get("attachment").trim() || record.attachment;
+  };
+
+  record.history.unshift(renewal);
+  record.issueDate = renewal.newIssueDate;
+  record.expiryDate = renewal.newExpiryDate;
+  record.attachment = renewal.newAttachment || record.attachment;
 
   els.renewDialog.close();
-  saveRecords();
-  render();
+  await saveRemoteRenewal(record, renewal);
 }
 
-function deleteRecord(id) {
+async function deleteRecord(id) {
   const record = state.records.find((item) => item.id === id);
   if (!record || !confirm(`حذف "${record.title}" من السجلات؟`)) return;
-
-  state.records = state.records.filter((item) => item.id !== id);
-  saveRecords();
-  populateFilters();
-  render();
+  await deleteRemoteRecord(id);
 }
 
 function render() {
@@ -325,17 +466,17 @@ function render() {
   renderRecords();
   renderEmployees();
   renderHistory();
-  saveRecords();
+  updateLastUpdated();
 }
 
 function renderDashboard() {
   const enriched = getEnrichedRecords();
   const metrics = [
-    { key: "expired", label: "منتهية", hint: "تحتاج تدخل", className: "expired", count: enriched.filter((item) => item.statusKey === "expired").length },
-    { key: "critical", label: "خلال 7 أيام", hint: "عاجلة", className: "critical", count: enriched.filter((item) => item.daysLeft >= 0 && item.daysLeft <= 7).length },
-    { key: "warning", label: "خلال 15 يوم", hint: "تجهيز الإجراء", className: "warning", count: enriched.filter((item) => item.daysLeft > 7 && item.daysLeft <= 15).length },
-    { key: "soon", label: "خلال 30 يوم", hint: "قريبة", className: "soon", count: enriched.filter((item) => item.daysLeft > 15 && item.daysLeft <= 30).length },
-    { key: "valid", label: "سارية", hint: "أكثر من 30 يوم", className: "valid", count: enriched.filter((item) => item.daysLeft > 30).length }
+    { label: "منتهية", hint: "تحتاج تدخل", className: "expired", count: enriched.filter((item) => item.statusKey === "expired").length },
+    { label: "خلال 7 أيام", hint: "عاجلة", className: "critical", count: enriched.filter((item) => item.daysLeft >= 0 && item.daysLeft <= 7).length },
+    { label: "خلال 15 يوم", hint: "تجهيز الإجراء", className: "warning", count: enriched.filter((item) => item.daysLeft > 7 && item.daysLeft <= 15).length },
+    { label: "خلال 30 يوم", hint: "قريبة", className: "soon", count: enriched.filter((item) => item.daysLeft > 15 && item.daysLeft <= 30).length },
+    { label: "سارية", hint: "أكثر من 30 يوم", className: "valid", count: enriched.filter((item) => item.daysLeft > 30).length }
   ];
 
   els.metricGrid.innerHTML = metrics.map((metric) => `
@@ -416,7 +557,7 @@ function renderHistory() {
   els.historyList.innerHTML = historyItems.length ? historyItems.map((item) => `
     <article class="history-item">
       <strong>${escapeHtml(item.title)} - ${escapeHtml(item.subject)}</strong>
-      <span>انتهاء سابق: ${formatDate(item.previousExpiryDate)} · تم التجديد: ${formatDate(item.renewedAt)} · المسؤول: ${escapeHtml(item.owner)}</span>
+      <span>انتهاء سابق: ${formatDate(item.previousExpiryDate)} · انتهاء جديد: ${formatDate(item.newExpiryDate)} · تم التجديد: ${formatDate(item.renewedAt)} · المسؤول: ${escapeHtml(item.owner)}</span>
       ${item.note ? `<span>${escapeHtml(item.note)}</span>` : ""}
     </article>
   `).join("") : `<div class="empty-state">لم يتم تسجيل تجديدات بعد</div>`;
@@ -531,6 +672,68 @@ function exportData() {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+}
+
+function recordToDb(record) {
+  return {
+    user_id: state.user?.id,
+    title: record.title,
+    category: record.category,
+    subject: record.subject,
+    owner: record.owner,
+    doc_number: record.docNumber || null,
+    issue_date: record.issueDate || null,
+    expiry_date: record.expiryDate,
+    attachment: record.attachment || null,
+    notes: record.notes || null
+  };
+}
+
+function recordFromDb(record) {
+  const history = Array.isArray(record.renewals)
+    ? record.renewals.map(renewalFromDb).sort((a, b) => new Date(b.renewedAt) - new Date(a.renewedAt))
+    : [];
+
+  return {
+    id: record.id,
+    title: record.title,
+    category: record.category,
+    subject: record.subject,
+    owner: record.owner,
+    docNumber: record.doc_number || "",
+    issueDate: record.issue_date || "",
+    expiryDate: record.expiry_date,
+    attachment: record.attachment || "",
+    notes: record.notes || "",
+    history
+  };
+}
+
+function renewalToDb(recordId, renewal) {
+  return {
+    record_id: recordId,
+    user_id: state.user?.id,
+    previous_issue_date: renewal.previousIssueDate || null,
+    previous_expiry_date: renewal.previousExpiryDate || null,
+    previous_attachment: renewal.previousAttachment || null,
+    new_issue_date: renewal.newIssueDate || null,
+    new_expiry_date: renewal.newExpiryDate,
+    new_attachment: renewal.newAttachment || null,
+    note: renewal.note || null
+  };
+}
+
+function renewalFromDb(renewal) {
+  return {
+    previousIssueDate: renewal.previous_issue_date || "",
+    previousExpiryDate: renewal.previous_expiry_date || "",
+    previousAttachment: renewal.previous_attachment || "",
+    newIssueDate: renewal.new_issue_date || "",
+    newExpiryDate: renewal.new_expiry_date || "",
+    newAttachment: renewal.new_attachment || "",
+    renewedAt: renewal.renewed_at,
+    note: renewal.note || ""
+  };
 }
 
 function escapeHtml(value) {

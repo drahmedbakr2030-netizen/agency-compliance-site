@@ -198,6 +198,29 @@ h3 {
   justify-content: flex-end;
 }
 
+.sync-status {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 11px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sync-status.online {
+  color: var(--green);
+  background: #f0fdf4;
+}
+
+.sync-status.error {
+  color: var(--red);
+  background: #fef2f2;
+}
+
 .primary-button,
 .secondary-button,
 .icon-button,
@@ -627,6 +650,35 @@ dialog::backdrop {
 .dialog-actions {
   justify-content: flex-start;
   margin-top: 18px;
+}
+
+.auth-copy {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.auth-copy span,
+.form-message {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.form-message {
+  min-height: 20px;
+  margin: 12px 0 0;
+}
+
+.form-message.error {
+  color: var(--red);
+}
+
+.form-message.success {
+  color: var(--green);
 }
 
 .empty-state {
